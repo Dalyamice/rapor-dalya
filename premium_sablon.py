@@ -103,6 +103,9 @@ __FONT_CSS__
   .etiket .isik { width:8px; height:8px; border-radius:50%; background:var(--aqua);
                   box-shadow:0 0 12px var(--aqua); }
   .etiket b { color:var(--mavi-soft); font-weight:700; }
+  .kunye { font-size:12.5px; color:var(--muted); margin-top:10px;
+           display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .kunye svg { flex:none; }
   h1 { font-family:var(--serif); font-weight:560; font-optical-sizing:auto;
        font-size:clamp(38px,6.8vw,66px); line-height:1.05; letter-spacing:-0.015em;
        margin:22px 0 24px; max-width:17ch; text-wrap:balance; }
@@ -340,6 +343,7 @@ __FONT_CSS__
 
   <header class="hero">
     <p class="etiket" data-in><span class="isik"></span><b>__PLAN_ADI__</b> · haftalık rapor · __ARALIK__</p>
+    <p class="kunye" data-in>__KUNYE__</p>
     <h1 id="baslik">__BASLIK__</h1>
     <p class="anlati" data-in>__ANLATI__</p>
     <div class="sayilar">__SAYILAR__</div>
@@ -398,7 +402,7 @@ __FONT_CSS__
 
   <footer>
     <span class="marka">__PLAN_ADI__ haftalık raporu</span>
-    <span>Planner verilerinden otomatik hazırlandı · her pazar akşamı yenilenir</span>
+    <span>__KUNYE_FOOT__</span>
   </footer>
 </div>
 

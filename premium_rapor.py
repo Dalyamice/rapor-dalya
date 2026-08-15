@@ -147,6 +147,22 @@ def uret(v: dict) -> str:
     d = date.fromisoformat(v["tarih"])
     aralik = f"{kisa(h['baslangic'])} – {kisa(h['bitis'])} {d.year}"
 
+    # künye: verinin Planner'dan çekildiği gün + raporun üretildiği an (TRT)
+    from datetime import datetime, timedelta, timezone
+    GUNLER = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+    AYLAR = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz",
+             "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    veri_t = f"{d.day} {AYLAR[d.month]} {d.year} {GUNLER[d.weekday()]}"
+    simdi = datetime.now(timezone(timedelta(hours=3)))
+    uretim_t = (f"{simdi.day} {AYLAR[simdi.month]} {simdi.year} "
+                f"{GUNLER[simdi.weekday()]} {simdi.strftime('%H:%M')}")
+    saat_ikon = ('<svg viewBox="0 0 16 16" width="12" height="12" fill="none" '
+                 'stroke="currentColor" stroke-width="1.5" stroke-linecap="round">'
+                 '<circle cx="8" cy="8" r="6.2"/><path d="M8 4.8V8l2.4 1.6"/></svg>')
+    kunye = (f"{saat_ikon}<span>Planner verisi: <b>{veri_t}</b> tarihinde çekildi"
+             f" &nbsp;·&nbsp; Rapor üretimi: <b>{uretim_t}</b> (TRT)</span>")
+    kunye_foot = f"Veri: {veri_t} · Üretim: {uretim_t} TRT · her pazar akşamı yenilenir"
+
     # --- hero sayıları
     fark = h["tamamlanan"] - h["onceki_tamamlanan"]
     if h["onceki_tamamlanan"]:
@@ -351,6 +367,8 @@ def uret(v: dict) -> str:
         "__TITLE__": f"{esc(v['plan_adi'])} · Haftalık Rapor · {aralik}",
         "__PLAN_ADI__": esc(v["plan_adi"]),
         "__ARALIK__": aralik,
+        "__KUNYE__": kunye,
+        "__KUNYE_FOOT__": kunye_foot,
         "__BASLIK__": vurgulu_baslik(baslik),
         "__ANLATI__": esc(para),
         "__SAYILAR__": sayilar,

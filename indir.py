@@ -22,7 +22,6 @@ def ac(url: str) -> bytes:
 
 
 def adaylar(link: str):
-    # https://TENANT/:u:/g/personal/KULLANICI/TOKEN?e=xx  →  download.aspx?share=TOKEN
     p = urllib.parse.urlparse(link)
     parcalar = [x for x in p.path.split("/") if x]
     try:
@@ -40,6 +39,7 @@ def adaylar(link: str):
 def indir(link: str, hedef: str) -> None:
     son_hata = None
     for url in adaylar(link):
+        veri = b""
         try:
             veri = ac(url)
             metin = veri.decode("utf-8-sig")
@@ -50,10 +50,8 @@ def indir(link: str, hedef: str) -> None:
             return
         except Exception as e:  # noqa: BLE001
             ozet = ""
-            try:
+            if veri:
                 ozet = " | yanıt başı: " + veri[:80].decode("utf-8", "ignore").replace("\n", " ")
-            except Exception:  # noqa: BLE001
-                pass
             son_hata = f"{e}{ozet}"
     raise RuntimeError(son_hata or "indirilemedi")
 
