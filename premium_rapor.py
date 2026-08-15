@@ -153,13 +153,24 @@ def uret(v: dict) -> str:
     AYLAR = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz",
              "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
     veri_t = f"{d.day} {AYLAR[d.month]} {d.year} {GUNLER[d.weekday()]}"
-    # gerçek çekilme saati varsa (veri_zamani.txt) tarihe saati de ekle
+    # gerçek çekilme saati: 1) veri_zamani.txt, 2) yorumlar.json içindeki _veri_zamani
+    def _zaman_kaynagi():
+        try:
+            return open("veri_zamani.txt").read().strip()
+        except OSError:
+            pass
+        try:
+            import json as _json
+            with open(os.path.join(_BURASI, "yorumlar.json"), encoding="utf-8") as f:
+                return _json.load(f).get("_veri_zamani", "")
+        except (OSError, ValueError):
+            return ""
     try:
-        _vz = datetime.fromisoformat(open("veri_zamani.txt").read().strip()) \
+        _vz = datetime.fromisoformat(_zaman_kaynagi()) \
             .astimezone(timezone(timedelta(hours=3)))
         veri_t = (f"{_vz.day} {AYLAR[_vz.month]} {_vz.year} "
                   f"{GUNLER[_vz.weekday()]} {_vz.strftime('%H:%M')}")
-    except (OSError, ValueError):
+    except ValueError:
         pass
     simdi = datetime.now(timezone(timedelta(hours=3)))
     uretim_t = (f"{simdi.day} {AYLAR[simdi.month]} {simdi.year} "
