@@ -1,0 +1,59 @@
+name: Haftalik Rapor Yayini
+
+on:
+  schedule:
+    - cron: "30 18 * * 0"   # Pazar 21:30 TRT (18:30 UTC)
+  workflow_dispatch: {}      # elle de tetiklenebilir (Actions sekmesi > Run workflow)
+
+permissions:
+  contents: write
+
+jobs:
+  yayinla:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bagimliliklar
+        run: pip install --quiet pandas openpyxl
+
+      - name: OneDrive'dan veri ve yorumlari indir
+        run: python bin/indir.py
+
+      - name: Raporu derle
+        run: |
+          python bin/json_kaynak.py gorevler.json kutular.json PLAN_guncel.xlsx
+          WEB_CDN=1 python bin/premium_rapor.py PLAN_guncel.xlsx rapor_duz.html
+        env:
+          PYTHONPATH: bin
+
+      - name: Parola ile sifrele
+        env:
+          PAROLA: ${{ secrets.RAPOR_PAROLASI }}
+        run: |
+          if [ -z "$PAROLA" ]; then echo "RAPOR_PAROLASI secret'i eksik!"; exit 1; fi
+          npx -y staticrypt rapor_duz.html -d _sifreli -p "$PAROLA" --short --remember 30 \
+            --template-title "DALYA Haftalık Rapor" \
+            --template-instructions "Bu sayfa şifrelidir. Ekip parolasını girin." \
+            --template-button "Raporu Aç" --template-placeholder "Parola" \
+            --template-error "Parola hatalı, tekrar deneyin" \
+            --template-remember "30 gün beni hatırla" \
+            --template-color-primary "#1c5cab" --template-color-secondary "#0a0d16"
+
+      - name: Siteyi guncelle ve yayinla
+        run: |
+          cp _sifreli/rapor_duz.html index.html
+          mkdir -p arsiv && cp _sifreli/rapor_duz.html "arsiv/$(date +%F).html"
+          rm -f gorevler.json kutular.json PLAN_guncel.xlsx rapor_duz.html bin/yorumlar.json bin/kisi_yorumlar.json
+          rm -rf _sifreli
+          git config user.name "rapor-botu"
+          git config user.email "rapor@dalyatur.com"
+          git add -A
+          git commit -m "Haftalık rapor: $(date +%F)" || echo "değişiklik yok"
+          git push
