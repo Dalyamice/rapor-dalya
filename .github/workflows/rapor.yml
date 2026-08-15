@@ -3,7 +3,7 @@ name: Haftalik Rapor Yayini
 on:
   schedule:
     - cron: "30 18 * * 0"   # Pazar 21:30 TRT (18:30 UTC)
-  workflow_dispatch: {}      # elle de tetiklenebilir (Actions sekmesi > Run workflow)
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -24,14 +24,12 @@ jobs:
         run: pip install --quiet pandas openpyxl
 
       - name: OneDrive'dan veri ve yorumlari indir
-        run: python bin/indir.py
+        run: python indir.py
 
       - name: Raporu derle
         run: |
-          python bin/json_kaynak.py gorevler.json kutular.json PLAN_guncel.xlsx
-          WEB_CDN=1 python bin/premium_rapor.py PLAN_guncel.xlsx rapor_duz.html
-        env:
-          PYTHONPATH: bin
+          python json_kaynak.py gorevler.json kutular.json PLAN_guncel.xlsx
+          WEB_CDN=1 python premium_rapor.py PLAN_guncel.xlsx rapor_duz.html
 
       - name: Parola ile sifrele
         env:
@@ -50,7 +48,7 @@ jobs:
         run: |
           cp _sifreli/rapor_duz.html index.html
           mkdir -p arsiv && cp _sifreli/rapor_duz.html "arsiv/$(date +%F).html"
-          rm -f gorevler.json kutular.json PLAN_guncel.xlsx rapor_duz.html bin/yorumlar.json bin/kisi_yorumlar.json
+          rm -f gorevler.json kutular.json PLAN_guncel.xlsx rapor_duz.html yorumlar.json kisi_yorumlar.json
           rm -rf _sifreli
           git config user.name "rapor-botu"
           git config user.email "rapor@dalyatur.com"
