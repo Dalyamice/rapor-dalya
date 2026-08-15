@@ -53,11 +53,19 @@ def cevir(gorevler_yolu: str, kutular_yolu: str, cikti: str = "PLAN_json.xlsx",
     with open(kutular_yolu, encoding="utf-8") as f:
         kutular = json.load(f)["value"]
 
-    # dışa aktarma tarihi: dosya adındaki YYYYMMDD, yoksa bugün (TRT)
+    # dışa aktarma tarihi: 1) veri_zamani.txt (gerçek OneDrive damgası),
+    # 2) dosya adındaki YYYYMMDD, 3) bugün (TRT)
     if bugun is None:
-        m = re.search(r"(\d{4})(\d{2})(\d{2})", os.path.basename(gorevler_yolu))
-        bugun = (datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
-                 if m else datetime.now(TRT).date())
+        if os.path.exists("veri_zamani.txt"):
+            try:
+                bugun = datetime.fromisoformat(
+                    open("veri_zamani.txt").read().strip()).astimezone(TRT).date()
+            except ValueError:
+                bugun = None
+        if bugun is None:
+            m = re.search(r"(\d{4})(\d{2})(\d{2})", os.path.basename(gorevler_yolu))
+            bugun = (datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
+                     if m else datetime.now(TRT).date())
 
     with open(os.path.join(_BURASI, "kullanicilar.json"), encoding="utf-8") as f:
         umap = json.load(f)

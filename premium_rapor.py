@@ -153,6 +153,14 @@ def uret(v: dict) -> str:
     AYLAR = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz",
              "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
     veri_t = f"{d.day} {AYLAR[d.month]} {d.year} {GUNLER[d.weekday()]}"
+    # gerçek çekilme saati varsa (veri_zamani.txt) tarihe saati de ekle
+    try:
+        _vz = datetime.fromisoformat(open("veri_zamani.txt").read().strip()) \
+            .astimezone(timezone(timedelta(hours=3)))
+        veri_t = (f"{_vz.day} {AYLAR[_vz.month]} {_vz.year} "
+                  f"{GUNLER[_vz.weekday()]} {_vz.strftime('%H:%M')}")
+    except (OSError, ValueError):
+        pass
     simdi = datetime.now(timezone(timedelta(hours=3)))
     uretim_t = (f"{simdi.day} {AYLAR[simdi.month]} {simdi.year} "
                 f"{GUNLER[simdi.weekday()]} {simdi.strftime('%H:%M')}")
