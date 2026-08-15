@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 """OneDrive paylaşım linklerinden güncel veri ve yorum dosyalarını indirir.
-
-GitHub Actions içinde çalışır: kaynaklar.json'daki 4 linki okur,
-her birini indirip geçerli JSON olduğunu doğrular.
-"""
+(v2 — düz depo yapısı: tüm dosyalar ana dizinde)"""
 import json
 import sys
 import urllib.request
 
 
 def indir(link: str, hedef: str) -> None:
-    # OneDrive paylaşım linkini doğrudan indirme moduna çevir
     ayrac = "&" if "?" in link else "?"
     url = link + ayrac + "download=1"
     istek = urllib.request.Request(url, headers={
@@ -18,7 +14,7 @@ def indir(link: str, hedef: str) -> None:
     with urllib.request.urlopen(istek, timeout=60) as y:
         veri = y.read()
     metin = veri.decode("utf-8-sig")
-    json.loads(metin)  # geçerlilik kontrolü — HTML dönerse burada patlar
+    json.loads(metin)  # HTML dönerse burada patlar
     with open(hedef, "w", encoding="utf-8") as f:
         f.write(metin)
     print(f"  ✓ {hedef}: {len(veri)//1024} KB")
@@ -30,8 +26,8 @@ if __name__ == "__main__":
     hedefler = {
         "gorevler": "gorevler.json",
         "kutular": "kutular.json",
-        "yorumlar": "bin/yorumlar.json",
-        "kisi_yorumlar": "bin/kisi_yorumlar.json",
+        "yorumlar": "yorumlar.json",
+        "kisi_yorumlar": "kisi_yorumlar.json",
     }
     hata = False
     for anahtar, dosya in hedefler.items():
