@@ -1,8 +1,6 @@
 name: Haftalik Rapor Yayini
 
 on:
-  schedule:
-    - cron: "30 18 * * 0"   # Pazar 21:30 TRT (18:30 UTC)
   workflow_dispatch: {}
 
 permissions:
