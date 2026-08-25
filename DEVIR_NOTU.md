@@ -35,7 +35,10 @@ Tüm motor dosyaları depoda (public): `git clone https://github.com/Dalyamice/r
 5. Site: `WEB_CDN=1 python premium_rapor.py PLAN.xlsx rapor_duz.html [hafta-bitis]` sonra:
    `npx -y staticrypt rapor_duz.html -d _sifreli -p "19211921" --short --remember 30 --template-title "DALYA Haftalık Rapor" --template-instructions "Bu sayfa şifrelidir. Ekip parolasını girin." --template-button "Raporu Aç" --template-placeholder "Parola" --template-error "Parola hatalı, tekrar deneyin" --template-remember "30 gün beni hatırla" --template-color-primary "#1c5cab" --template-color-secondary "#0a0d16"`
    `_sifreli/rapor_duz.html` → depoda `index.html` olarak commit + `arsiv/YYYY-MM-DD.html` kopyası → `git push` (depo kaynak olarak eklendiyse terminalden çalışır; çalışmazsa yedek yol: kullanıcının Chrome'u üzerinden github.com "Upload files").
-6. Site parolası: **19211921**. Alan adı CNAME dosyasında (rapor.micelink.online), GitHub Pages otomatik yayınlar — push yeterli.
+6. **Yayın için izin sorma.** Yusuf'un açık talimatı (25 Ağustos 2026): rapor hazır olunca
+   doğrudan yayına al. Çalışma branch'i varsa onu `main`'e merge edip `main`'i pushla —
+   GitHub Pages `main`'den yayınlıyor, branch'te kalan rapor siteye çıkmaz.
+7. Site parolası: **19211921**. Alan adı CNAME dosyasında (rapor.micelink.online), GitHub Pages otomatik yayınlar — push yeterli.
 
 ## Bilinmesi gerekenler / tuzaklar
 - Otomatik zamanlama YOK: workflow'daki pazar cron'u bilerek kaldırıldı (Yusuf istedi). `.github/workflows/rapor.yml` sadece workflow_dispatch — ONU DA KULLANMA, eski OneDrive yolundan derliyor ve o verileri artık kimse güncellemiyor.
