@@ -98,7 +98,7 @@ def analiz_et(xlsx_yolu: str, bugun: date | None = None) -> dict:
     bugun_tamam = t[t["ct"] == bugun]
     dun_tamam = t[t["ct"] == dun]
     bugun_yeni = t[t["cr"] == bugun]
-    hafta_tamam = t[(t["ct"].notna()) & (t["ct"] > hafta)]
+    hafta_tamam = t[(t["ct"].notna()) & (t["ct"] > hafta) & (t["ct"] <= bugun)]
 
     def gorev_listesi(df):
         out = []
@@ -152,7 +152,8 @@ def analiz_et(xlsx_yolu: str, bugun: date | None = None) -> dict:
         } for _, r in acik_grp.iterrows()],
             key=lambda x: (not x["geciken"], x["son"] or "9999"))
         bitenler_hafta = [str(r["Görev Adı"]).strip()
-                          for _, r in grp[(grp["ct"].notna()) & (grp["ct"] > hafta)].iterrows()]
+                          for _, r in grp[(grp["ct"].notna()) & (grp["ct"] > hafta)
+                                          & (grp["ct"] <= bugun)].iterrows()]
         kayit = {
             "ad": kutu,
             "toplam": len(grp),
@@ -160,7 +161,8 @@ def analiz_et(xlsx_yolu: str, bugun: date | None = None) -> dict:
             "acik": int((~grp["tamam"]).sum()),
             "geciken": int(((grp["Geciken"] == True) & (~grp["tamam"])).sum()),  # noqa: E712
             "bugun_tamam": int((grp["ct"] == bugun).sum()),
-            "hafta_tamam": int(((grp["ct"].notna()) & (grp["ct"] > hafta)).sum()),
+            "hafta_tamam": int(((grp["ct"].notna()) & (grp["ct"] > hafta)
+                                & (grp["ct"] <= bugun)).sum()),
             "acik_isler": acik_isler,
             "bitenler_hafta": bitenler_hafta,
         }

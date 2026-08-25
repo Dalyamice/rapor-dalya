@@ -207,7 +207,9 @@ def uret(v: dict) -> str:
         with open(yorum_yolu, encoding="utf-8") as f:
             yorumlar = {k2: v2 for k2, v2 in _json.load(f).items() if not k2.startswith("_")}
 
-    gelecek = [o for o in v["orglar"] if o["kalan_gun"] >= -3]
+    # yaklaşan/süren etkinlikler + rapor haftası içinde biten etkinlikler
+    gelecek = [o for o in v["orglar"]
+               if o["kalan_gun"] >= -3 or o["bitis"] >= h["baslangic"]]
     ilk, kalanlar = gelecek[:10], gelecek[10:]
 
     def org_satir(o):
@@ -407,7 +409,10 @@ def uret(v: dict) -> str:
 if __name__ == "__main__":
     xlsx = sys.argv[1]
     cikti = sys.argv[2] if len(sys.argv) > 2 else "haftalik_rapor_premium.html"
-    v = haftalik_veri(xlsx)
+    # 3. argüman ya da RAPOR_TARIHI: haftanın bitiş günü (YYYY-AA-GG).
+    # Verilmezse Excel'in dışa aktarma tarihi kullanılır.
+    _bitis = sys.argv[3] if len(sys.argv) > 3 else os.environ.get("RAPOR_TARIHI", "")
+    v = haftalik_veri(xlsx, date.fromisoformat(_bitis) if _bitis else None)
     with open(cikti, "w", encoding="utf-8") as f:
         f.write(uret(v))
     print(f"✓ {cikti} üretildi")
