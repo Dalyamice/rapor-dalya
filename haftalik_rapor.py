@@ -34,9 +34,14 @@ def ilk_ad(tam: str) -> str:
 
 
 # --------------------------------------------------------------------------
-def haftalik_veri(xlsx_yolu: str) -> dict:
-    """Günlük analizin üstüne haftalık pencere hesapları ekler."""
-    v = analiz_et(xlsx_yolu)
+def haftalik_veri(xlsx_yolu: str, bugun: date | None = None) -> dict:
+    """Günlük analizin üstüne haftalık pencere hesapları ekler.
+
+    `bugun` verilmezse Excel'in dışa aktarma tarihi kullanılır. Hafta ortasında
+    çekilmiş bir dosyadan geçmiş bir haftayı (ör. pazar akşamı biten hafta)
+    raporlamak için bitiş günü elle verilebilir.
+    """
+    v = analiz_et(xlsx_yolu, bugun)
     bugun = date.fromisoformat(v["tarih"])
     h_bas = bugun - timedelta(days=6)          # bu hafta: son 7 gün
     o_bas, o_son = h_bas - timedelta(days=7), h_bas - timedelta(days=1)
@@ -217,7 +222,9 @@ def uret(v: dict) -> str:
     </div>"""
 
     # --- organizasyon tablosu (samimi durum etiketli)
-    gelecek = [o for o in v["orglar"] if o["kalan_gun"] >= -3]
+    # yaklaşan/süren etkinlikler + rapor haftası içinde biten etkinlikler
+    gelecek = [o for o in v["orglar"]
+               if o["kalan_gun"] >= -3 or o["bitis"] >= h["baslangic"]]
     ilk, kalanlar = gelecek[:10], gelecek[10:]
 
     def org_satir(o):
